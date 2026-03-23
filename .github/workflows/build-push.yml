@@ -1,0 +1,73 @@
+name: Build and Push Base Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'python-fastapi/**'
+      - 'node-api/**'
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      python-fastapi: ${{ steps.filter.outputs.python-fastapi }}
+      node-api: ${{ steps.filter.outputs.node-api }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            python-fastapi:
+              - 'python-fastapi/**'
+            node-api:
+              - 'node-api/**'
+
+  build-python-fastapi:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.python-fastapi == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./python-fastapi
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_USERNAME }}/imagem-base-otimizada:latest
+            ${{ env.DOCKERHUB_USERNAME }}/imagem-base-otimizada:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # build-node-api:
+  #   needs: detect-changes
+  #   if: needs.detect-changes.outputs.node-api == 'true'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: docker/setup-buildx-action@v3
+  #     - uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     - uses: docker/build-push-action@v6
+  #       with:
+  #         context: ./node-api
+  #         push: true
+  #         tags: |
+  #           ${{ env.DOCKERHUB_USERNAME }}/node-api:latest
+  #           ${{ env.DOCKERHUB_USERNAME }}/node-api:${{ github.sha }}
+  #         cache-from: type=gha
+  #         cache-to: type=gha,mode=max

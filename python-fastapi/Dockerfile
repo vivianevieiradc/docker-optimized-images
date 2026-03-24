@@ -15,7 +15,7 @@ FROM python:3.12-slim
 
 LABEL org.opencontainers.image.title="python-fastapi-base" \
       org.opencontainers.image.description="Optimized Python/FastAPI base image" \
-      org.opencontainers.image.source="https://github.com/vivikk/docker-optimized-images"
+      org.opencontainers.image.source="https://github.com/vivianevieiradc/docker-optimized-images"
 
 RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser
 

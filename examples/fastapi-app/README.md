@@ -1,6 +1,6 @@
 # 🚀 fastapi-example-app
 
-Aplicação de exemplo que consome a imagem base otimizada [`python-fastapi`](https://github.com/vivikk/docker-optimized-images).
+Aplicação de exemplo que consome a imagem base otimizada [`python-fastapi`](https://github.com/vivianevieiradc/docker-optimized-images).
 
 ## Como funciona
 
